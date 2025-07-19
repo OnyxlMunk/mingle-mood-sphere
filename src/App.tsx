@@ -24,6 +24,9 @@ import Feed from "./pages/feed/Feed";
 import AIChat from "./pages/support/AIChat";
 import Settings from "./pages/settings/Settings";
 
+// Components
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -41,14 +44,14 @@ const App = () => (
           <Route path="/auth/register" element={<Register />} />
           
           {/* Authenticated Routes */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/mood" element={<MoodTracker />} />
-          <Route path="/forum" element={<Forum />} />
-          <Route path="/communities" element={<Communities />} />
-          <Route path="/feed" element={<Feed />} />
-          <Route path="/support" element={<AIChat />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/mood" element={<ProtectedRoute><MoodTracker /></ProtectedRoute>} />
+          <Route path="/forum" element={<ProtectedRoute><Forum /></ProtectedRoute>} />
+          <Route path="/communities" element={<ProtectedRoute><Communities /></ProtectedRoute>} />
+          <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
+          <Route path="/support" element={<ProtectedRoute><AIChat /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           
           {/* Catch-all route for 404 */}
           <Route path="*" element={<NotFound />} />

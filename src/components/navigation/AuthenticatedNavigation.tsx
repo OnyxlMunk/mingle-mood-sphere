@@ -11,18 +11,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { authenticatedNavigationItems } from '@/utils/navigation';
 import { NavigationItems } from './NavigationItems';
 import { useNavigation } from '@/hooks/useNavigation';
+import { useAuth } from '@/hooks/useAuth';
 
 export function AuthenticatedNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isActiveRoute } = useNavigation();
-
-  const handleSignOut = () => {
-    // TODO: Implement sign out functionality
-    console.log('Sign out');
-  };
+  const { user, signOut } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
@@ -57,9 +55,13 @@ export function AuthenticatedNavigation() {
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                  <User className="w-4 h-4" />
-                  <span>Profile</span>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.user_metadata?.avatar_url} alt="User" />
+                    <AvatarFallback>
+                      {user?.email?.charAt(0).toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -70,7 +72,7 @@ export function AuthenticatedNavigation() {
                   <Link to="/settings">Settings</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
+                <DropdownMenuItem onClick={signOut}>
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
                 </DropdownMenuItem>
@@ -98,7 +100,7 @@ export function AuthenticatedNavigation() {
                 onItemClick={() => setIsMenuOpen(false)}
               />
               <div className="px-3 py-2 space-y-2 border-t mt-3 pt-3">
-                <Button variant="outline" className="w-full justify-start" onClick={handleSignOut}>
+                <Button variant="outline" className="w-full justify-start" onClick={signOut}>
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
                 </Button>
