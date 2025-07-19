@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { PublicNavigation } from './PublicNavigation';
 import { AuthenticatedNavigation } from './AuthenticatedNavigation';
 import { MobileNavigation } from './MobileNavigation';
+import { cn } from '@/lib/utils';
 
 interface NavigationWrapperProps {
   children: ReactNode;

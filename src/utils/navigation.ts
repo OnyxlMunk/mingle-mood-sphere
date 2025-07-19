@@ -6,7 +6,7 @@ import {
   Heart, 
   MessageSquare, 
   Users, 
-  Feed,
+  Rss,
   Bot,
   Settings,
   LogIn,
@@ -65,7 +65,7 @@ export const authenticatedNavigationItems: NavigationItem[] = [
   {
     name: 'Feed',
     href: '/feed',
-    icon: Feed,
+    icon: Rss,
     requiresAuth: true
   },
   {
@@ -104,7 +104,7 @@ export const mobileBottomNavItems: NavigationItem[] = [
   {
     name: 'Feed',
     href: '/feed',
-    icon: Feed,
+    icon: Rss,
     requiresAuth: true
   },
   {
