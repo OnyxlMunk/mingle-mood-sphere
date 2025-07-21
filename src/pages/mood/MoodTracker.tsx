@@ -2,6 +2,8 @@
 import { useEffect } from 'react';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { useNavigation } from '@/hooks/useNavigation';
+import { MoodLogger } from '@/components/mood/MoodLogger';
+import { MoodHistory } from '@/components/mood/MoodHistory';
 
 export default function MoodTracker() {
   const { updateBreadcrumbs } = useNavigation();
@@ -15,9 +17,9 @@ export default function MoodTracker() {
 
   return (
     <DashboardLayout title="Mood Tracker">
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-semibold mb-4">Mood Tracker Coming Soon</h2>
-        <p className="text-muted-foreground">Track your daily moods and see patterns over time.</p>
+      <div className="space-y-6">
+        <MoodLogger />
+        <MoodHistory />
       </div>
     </DashboardLayout>
   );
