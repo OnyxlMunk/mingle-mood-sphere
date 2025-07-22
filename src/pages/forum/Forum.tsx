@@ -3,12 +3,14 @@ import { useEffect } from 'react';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { useNavigation } from '@/hooks/useNavigation';
 import { usePosts } from '@/hooks/usePosts';
+import { useAuth } from '@/hooks/useAuth';
 import { CreatePost } from '@/components/forum/CreatePost';
 import { PostCard } from '@/components/forum/PostCard';
 
 export default function Forum() {
   const { updateBreadcrumbs } = useNavigation();
   const { posts, loading, deletePost } = usePosts();
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
     updateBreadcrumbs([
@@ -16,6 +18,41 @@ export default function Forum() {
       { name: 'Forum' }
     ]);
   }, [updateBreadcrumbs]);
+
+  // Show loading while auth is loading
+  if (authLoading) {
+    return (
+      <DashboardLayout title="Community Forum">
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-semibold">Discussions</h2>
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          </div>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-48 bg-muted rounded-lg animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Show message if user is not authenticated
+  if (!user) {
+    return (
+      <DashboardLayout title="Community Forum">
+        <div className="space-y-6">
+          <div className="text-center py-12">
+            <h3 className="text-lg font-semibold mb-2">Authentication Required</h3>
+            <p className="text-muted-foreground">Please log in to access the forum.</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout title="Community Forum">

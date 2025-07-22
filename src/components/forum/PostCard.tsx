@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,20 @@ export function PostCard({ post, onDelete }: PostCardProps) {
   const { user } = useAuth();
 
   const isAuthor = user?.id === post.author_id;
-  const authorName = post.profiles?.display_name || post.profiles?.username || 'Unknown User';
+  
+  // Better fallback for author name
+  const getAuthorName = () => {
+    if (post.profiles?.display_name) {
+      return post.profiles.display_name;
+    }
+    if (post.profiles?.username) {
+      return post.profiles.username;
+    }
+    // Fallback to first part of author_id if no profile data
+    return `User ${post.author_id.slice(0, 8)}`;
+  };
+
+  const authorName = getAuthorName();
 
   return (
     <Card className={post.is_pinned ? 'border-primary' : ''}>
@@ -36,7 +50,7 @@ export function PostCard({ post, onDelete }: PostCardProps) {
             </div>
             <CardDescription>
               By {authorName} • {format(new Date(post.created_at), 'MMM d, yyyy at h:mm a')}
-              {post.communities && (
+              {post.communities?.name && (
                 <> • in {post.communities.name}</>
               )}
             </CardDescription>

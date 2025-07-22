@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useComments } from '@/hooks/usePosts';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,17 @@ export function CommentSection({ postId }: CommentSectionProps) {
     await addComment(newComment);
     setNewComment('');
     setIsSubmitting(false);
+  };
+
+  const getAuthorName = (comment: any) => {
+    if (comment.profiles?.display_name) {
+      return comment.profiles.display_name;
+    }
+    if (comment.profiles?.username) {
+      return comment.profiles.username;
+    }
+    // Fallback to first part of author_id if no profile data
+    return `User ${comment.author_id.slice(0, 8)}`;
   };
 
   if (loading) {
@@ -62,7 +74,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
         ) : (
           comments.map((comment) => {
             const isAuthor = user?.id === comment.author_id;
-            const authorName = comment.profiles?.display_name || comment.profiles?.username || 'Unknown User';
+            const authorName = getAuthorName(comment);
 
             return (
               <div

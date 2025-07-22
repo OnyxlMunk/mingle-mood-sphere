@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -39,18 +40,39 @@ export interface Comment {
 export function usePosts(communityId?: string) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchPosts();
-  }, [communityId]);
+    // Don't fetch posts until auth is loaded
+    if (!authLoading) {
+      fetchPosts();
+    }
+  }, [communityId, authLoading, user]);
 
   const fetchPosts = async () => {
     try {
+      setLoading(true);
+      
+      // Check if user is authenticated
+      if (!user) {
+        console.log('User not authenticated, cannot fetch posts');
+        setPosts([]);
+        return;
+      }
+
       let query = supabase
         .from('forum_posts')
-        .select('*')
+        .select(`
+          *,
+          profiles!forum_posts_author_id_fkey (
+            username,
+            display_name
+          ),
+          communities (
+            name
+          )
+        `)
         .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: false });
 
@@ -60,21 +82,35 @@ export function usePosts(communityId?: string) {
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching posts:', error);
+        throw error;
+      }
+      
+      console.log('Posts fetched successfully:', data?.length || 0);
       setPosts(data || []);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error in fetchPosts:', error);
       toast({
         title: "Error loading posts",
-        description: "Failed to load forum posts.",
+        description: error.message || "Failed to load forum posts. Please try again.",
         variant: "destructive"
       });
+      setPosts([]);
     } finally {
       setLoading(false);
     }
   };
 
   const createPost = async (title: string, content: string, communityId?: string) => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to create a post.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -85,7 +121,16 @@ export function usePosts(communityId?: string) {
           author_id: user.id,
           community_id: communityId
         }])
-        .select('*')
+        .select(`
+          *,
+          profiles!forum_posts_author_id_fkey (
+            username,
+            display_name
+          ),
+          communities (
+            name
+          )
+        `)
         .single();
 
       if (error) throw error;
@@ -95,16 +140,26 @@ export function usePosts(communityId?: string) {
         title: "Post created",
         description: "Your post has been published."
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error creating post:', error);
       toast({
         title: "Error creating post",
-        description: "Failed to create your post. Please try again.",
+        description: error.message || "Failed to create your post. Please try again.",
         variant: "destructive"
       });
     }
   };
 
   const deletePost = async (id: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to delete posts.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('forum_posts')
@@ -118,10 +173,11 @@ export function usePosts(communityId?: string) {
         title: "Post deleted",
         description: "Your post has been deleted."
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error deleting post:', error);
       toast({
         title: "Error deleting post",
-        description: "Failed to delete your post. Please try again.",
+        description: error.message || "Failed to delete your post. Please try again.",
         variant: "destructive"
       });
     }
@@ -129,7 +185,7 @@ export function usePosts(communityId?: string) {
 
   return {
     posts,
-    loading,
+    loading: loading || authLoading,
     createPost,
     deletePost,
     refetch: fetchPosts
@@ -139,38 +195,66 @@ export function usePosts(communityId?: string) {
 export function useComments(postId: string) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (postId) {
+    if (postId && !authLoading) {
       fetchComments();
     }
-  }, [postId]);
+  }, [postId, authLoading, user]);
 
   const fetchComments = async () => {
     try {
+      setLoading(true);
+      
+      if (!user) {
+        console.log('User not authenticated, cannot fetch comments');
+        setComments([]);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('forum_comments')
-        .select('*')
+        .select(`
+          *,
+          profiles!forum_comments_author_id_fkey (
+            username,
+            display_name
+          )
+        `)
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching comments:', error);
+        throw error;
+      }
+      
+      console.log('Comments fetched successfully:', data?.length || 0);
       setComments(data || []);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error in fetchComments:', error);
       toast({
         title: "Error loading comments",
-        description: "Failed to load comments.",
+        description: error.message || "Failed to load comments. Please try again.",
         variant: "destructive"
       });
+      setComments([]);
     } finally {
       setLoading(false);
     }
   };
 
   const addComment = async (content: string, parentCommentId?: string) => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to comment.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -181,7 +265,13 @@ export function useComments(postId: string) {
           post_id: postId,
           parent_comment_id: parentCommentId
         }])
-        .select('*')
+        .select(`
+          *,
+          profiles!forum_comments_author_id_fkey (
+            username,
+            display_name
+          )
+        `)
         .single();
 
       if (error) throw error;
@@ -191,16 +281,26 @@ export function useComments(postId: string) {
         title: "Comment added",
         description: "Your comment has been posted."
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error adding comment:', error);
       toast({
         title: "Error adding comment",
-        description: "Failed to post your comment. Please try again.",
+        description: error.message || "Failed to post your comment. Please try again.",
         variant: "destructive"
       });
     }
   };
 
   const deleteComment = async (id: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to delete comments.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('forum_comments')
@@ -214,10 +314,11 @@ export function useComments(postId: string) {
         title: "Comment deleted",
         description: "Your comment has been deleted."
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error deleting comment:', error);
       toast({
         title: "Error deleting comment",
-        description: "Failed to delete your comment. Please try again.",
+        description: error.message || "Failed to delete your comment. Please try again.",
         variant: "destructive"
       });
     }
@@ -225,7 +326,7 @@ export function useComments(postId: string) {
 
   return {
     comments,
-    loading,
+    loading: loading || authLoading,
     addComment,
     deleteComment,
     refetch: fetchComments
