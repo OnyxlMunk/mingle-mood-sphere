@@ -1,7 +1,9 @@
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ArrowRight, CheckCircle, Sparkles } from "lucide-react";
+import { Heart, ArrowRight, CheckCircle, Sparkles, UserPlus, LogIn } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function CTASection() {
   const benefits = [
@@ -33,8 +35,8 @@ export function CTASection() {
                 </h2>
                 
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Connect with Supabase to unlock the full MoodMingle experience. 
-                  Create your profile, start tracking your moods, and join our caring community today.
+                  Join our caring community today. Create your profile, start tracking your moods, 
+                  and connect with others who understand your journey.
                 </p>
               </div>
 
@@ -53,13 +55,18 @@ export function CTASection() {
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 shadow-mood group">
-                  <Sparkles className="w-4 h-4 mr-2 group-hover:animate-pulse" />
-                  Connect to Supabase & Start
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                <Button size="lg" className="bg-primary hover:bg-primary/90 shadow-mood group" asChild>
+                  <Link to="/auth/register">
+                    <Sparkles className="w-4 h-4 mr-2 group-hover:animate-pulse" />
+                    Join MoodMingle Now
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Link>
                 </Button>
-                <Button variant="outline" size="lg" className="bg-card/80 backdrop-blur">
-                  Learn About Our Mission
+                <Button variant="outline" size="lg" className="bg-card/80 backdrop-blur" asChild>
+                  <Link to="/auth/login">
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Already a Member? Sign In
+                  </Link>
                 </Button>
               </div>
 
@@ -77,15 +84,6 @@ export function CTASection() {
                   <div className="w-2 h-2 bg-mood-grateful rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
                   <span>Privacy First</span>
                 </div>
-              </div>
-
-              {/* Special Note */}
-              <div className="mt-8 p-4 bg-card/80 backdrop-blur rounded-xl border border-primary/20">
-                <p className="text-sm text-muted-foreground">
-                  <strong className="text-primary">Important:</strong> This app requires Supabase integration for authentication, 
-                  database functionality, and backend features. Click the green Supabase button in the top right to connect 
-                  and unlock the full MoodMingle experience.
-                </p>
               </div>
             </div>
           </div>

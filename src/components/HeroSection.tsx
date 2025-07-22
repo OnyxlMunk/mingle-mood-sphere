@@ -1,7 +1,9 @@
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Heart, Users, TrendingUp, Shield, Sparkles, ArrowRight } from "lucide-react";
+import { Heart, Users, TrendingUp, Shield, Sparkles, ArrowRight, LogIn, UserPlus } from "lucide-react";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-image.jpg";
 
 export function HeroSection() {
@@ -64,12 +66,18 @@ export function HeroSection() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 shadow-mood">
-                Start Your Journey
-                <ArrowRight className="w-4 h-4 ml-2" />
+              <Button size="lg" className="bg-primary hover:bg-primary/90 shadow-mood" asChild>
+                <Link to="/auth/register">
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Start Your Journey
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
               </Button>
-              <Button variant="outline" size="lg">
-                Learn More
+              <Button variant="outline" size="lg" asChild>
+                <Link to="/auth/login">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Sign In
+                </Link>
               </Button>
             </div>
 
