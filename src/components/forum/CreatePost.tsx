@@ -23,7 +23,10 @@ export function CreatePost() {
     if (!title.trim() || !content.trim()) return;
 
     setIsSubmitting(true);
-    await createPost(title, content, communityId || undefined);
+    
+    // Pass undefined for general forum (no specific community)
+    const selectedCommunityId = communityId === 'general' ? undefined : communityId || undefined;
+    await createPost(title, content, selectedCommunityId);
     
     // Reset form and close dialog
     setTitle('');
@@ -66,7 +69,7 @@ export function CreatePost() {
                 <SelectValue placeholder="Select a community or leave blank for general forum" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">General Forum</SelectItem>
+                <SelectItem value="general">General Forum</SelectItem>
                 {userCommunities.map((community) => (
                   <SelectItem key={community.id} value={community.id}>
                     {community.name}
