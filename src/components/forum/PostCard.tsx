@@ -22,13 +22,7 @@ export function PostCard({ post, onDelete }: PostCardProps) {
   
   // Better fallback for author name
   const getAuthorName = () => {
-    if (post.profiles?.display_name) {
-      return post.profiles.display_name;
-    }
-    if (post.profiles?.username) {
-      return post.profiles.username;
-    }
-    // Fallback to first part of author_id if no profile data
+    // Fallback to first part of author_id since profile data is not joined
     return `User ${post.author_id.slice(0, 8)}`;
   };
 
@@ -50,9 +44,6 @@ export function PostCard({ post, onDelete }: PostCardProps) {
             </div>
             <CardDescription>
               By {authorName} • {format(new Date(post.created_at), 'MMM d, yyyy at h:mm a')}
-              {post.communities?.name && (
-                <> • in {post.communities.name}</>
-              )}
             </CardDescription>
           </div>
           {isAuthor && (

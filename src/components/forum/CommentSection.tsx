@@ -28,13 +28,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
   };
 
   const getAuthorName = (comment: any) => {
-    if (comment.profiles?.display_name) {
-      return comment.profiles.display_name;
-    }
-    if (comment.profiles?.username) {
-      return comment.profiles.username;
-    }
-    // Fallback to first part of author_id if no profile data
+    // Fallback to first part of author_id since profile data is not joined
     return `User ${comment.author_id.slice(0, 8)}`;
   };
 

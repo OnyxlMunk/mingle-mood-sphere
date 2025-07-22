@@ -14,13 +14,6 @@ export interface Post {
   is_pinned: boolean;
   created_at: string;
   updated_at: string;
-  profiles?: {
-    username: string;
-    display_name?: string;
-  };
-  communities?: {
-    name: string;
-  };
 }
 
 export interface Comment {
@@ -31,10 +24,6 @@ export interface Comment {
   parent_comment_id?: string;
   created_at: string;
   updated_at: string;
-  profiles?: {
-    username: string;
-    display_name?: string;
-  };
 }
 
 export function usePosts(communityId?: string) {
@@ -63,16 +52,7 @@ export function usePosts(communityId?: string) {
 
       let query = supabase
         .from('forum_posts')
-        .select(`
-          *,
-          profiles!forum_posts_author_id_fkey (
-            username,
-            display_name
-          ),
-          communities (
-            name
-          )
-        `)
+        .select('*')
         .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: false });
 
@@ -121,16 +101,7 @@ export function usePosts(communityId?: string) {
           author_id: user.id,
           community_id: communityId
         }])
-        .select(`
-          *,
-          profiles!forum_posts_author_id_fkey (
-            username,
-            display_name
-          ),
-          communities (
-            name
-          )
-        `)
+        .select('*')
         .single();
 
       if (error) throw error;
@@ -216,13 +187,7 @@ export function useComments(postId: string) {
 
       const { data, error } = await supabase
         .from('forum_comments')
-        .select(`
-          *,
-          profiles!forum_comments_author_id_fkey (
-            username,
-            display_name
-          )
-        `)
+        .select('*')
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
 
@@ -265,13 +230,7 @@ export function useComments(postId: string) {
           post_id: postId,
           parent_comment_id: parentCommentId
         }])
-        .select(`
-          *,
-          profiles!forum_comments_author_id_fkey (
-            username,
-            display_name
-          )
-        `)
+        .select('*')
         .single();
 
       if (error) throw error;
